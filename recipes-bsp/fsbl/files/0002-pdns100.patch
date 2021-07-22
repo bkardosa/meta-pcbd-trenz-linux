@@ -1,0 +1,165 @@
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h ../git/lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h
+--- ./lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h	2021-07-22 12:36:18.039028303 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h	2021-07-22 12:39:50.156924603 +0200
+@@ -29,8 +29,8 @@
+ /* Number of Fabric Resets */
+ #define XPAR_NUM_FABRIC_RESETS 1
+ 
+-#define STDIN_BASEADDRESS 0xFF000000
+-#define STDOUT_BASEADDRESS 0xFF000000
++#define STDIN_BASEADDRESS 0xFF010000
++#define STDOUT_BASEADDRESS 0xFF010000
+ 
+ /******************************************************************/
+ 
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c
+--- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-22 12:36:18.043028338 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-22 12:37:00.007403649 +0200
+@@ -143,30 +143,18 @@
+   xil_printf("TE0803 TE_XFsbl_HookPsuInit_Custom\r\n"); 
+   /* Add the code here */
+   // ------------------------------------------------------
+-  // reset PCI and USB
++  // reset USB0, USB1
+   	u32 dataVal = 0;
+ 
+     // USB reset  
+-		/* Set MIO30 direction as output */
+-    XFsbl_Out32(GPIO_DIRM_1, XFsbl_In32(GPIO_DIRM_1) | GPIO_MIO30_MASK);
++    /* Set MIO34, MIO35 direction as output */
++    XFsbl_Out32(GPIO_DIRM_1, XFsbl_In32(GPIO_DIRM_1) | GPIO_MIO34_MASK | GPIO_MIO35_MASK);
+ 
+-		/* Set MIO30 output enable */
+-    XFsbl_Out32(GPIO_OEN_1, XFsbl_In32(GPIO_OEN_1) | GPIO_MIO30_MASK);  
++	/* Set MIO34-35 output enable */
++    XFsbl_Out32(GPIO_OEN_1, XFsbl_In32(GPIO_OEN_1) | GPIO_MIO34_MASK | GPIO_MIO35_MASK);  
+     
+-    /* Set MIO30 to LOW */
+-		dataVal = XFsbl_In32(GPIO_DATA_1) & ~(GPIO_MIO30_MASK);
+-		XFsbl_Out32(GPIO_DATA_1, dataVal);
+-    
+-    // pcie reset
+-    /* Set MIO31 direction as output */
+-    XFsbl_Out32(GPIO_DIRM_1, XFsbl_In32(GPIO_DIRM_1) | GPIO_MIO31_MASK);
+-
+-    /* Set MIO31 output enable */
+-    XFsbl_Out32(GPIO_OEN_1, XFsbl_In32(GPIO_OEN_1) | GPIO_MIO31_MASK);
+-
+-
+-    /* Set MIO31 to LOW */
+-    dataVal = XFsbl_In32(GPIO_DATA_1) & ~(GPIO_MIO31_MASK);
++    /* Set MIO34-35 to LOW */
++		dataVal = XFsbl_In32(GPIO_DATA_1) & ~(GPIO_MIO34_MASK) & ~(GPIO_MIO35_MASK);
+     XFsbl_Out32(GPIO_DATA_1, dataVal);
+ 
+   // ------------------------------------------------------
+@@ -175,13 +163,6 @@
+      xil_printf("Error:I2C Init\r\n");
+      goto END;
+   }
+-  // change I2C switch to get access to SI5345
+-  xil_printf("Configure Carrier I2C Switch 0x77\r\n");
+-  Status = iic_write8(0x77, 0x00,  0x10);    // Configure I2C Switch
+-  if (Status != XFSBL_SUCCESS) {
+-     xil_printf("Error: Configure TEBF0808 I2C Switch 0x77 for TE0803 SI5338 access\r\n");
+-     goto END;
+-  }
+   
+   xil_printf("Configure PLL: ");
+ 
+@@ -203,18 +184,13 @@
+   }
+   
+   // ------------------------------------------------------
+-  // release PCI and USB reset
+-  /* Set MIO30 to HIGH */
+-  dataVal = XFsbl_In32(GPIO_DATA_1) | GPIO_MIO30_MASK;
++  // release USB resets
++  /* Set MIO34-35 to HIGH */
++  dataVal = XFsbl_In32(GPIO_DATA_1) | GPIO_MIO34_MASK | GPIO_MIO35_MASK;
+   XFsbl_Out32(GPIO_DATA_1, dataVal);
+   xil_printf("USB Reset Complete \r\n");
+   
+ 
+-  /* Set MIO31 to HIGH */
+-  dataVal = XFsbl_In32(GPIO_DATA_1) | GPIO_MIO31_MASK;
+-  XFsbl_Out32(GPIO_DATA_1, dataVal);
+-  xil_printf("PCIe Reset Complete\r\n");
+-
+   // ------------------------------------------------------
+   xil_printf("\r\n--------------------------------------------------------------------------------\r\n");
+   /* wait after initialization*/
+@@ -337,15 +313,14 @@
+   xil_printf("TE0803 TE_XFsbl_BoardInit_Custom\r\n");
+ 	// /* Add the code here */
+ 
+-  //check USB,PCIe Reset
++  //check USB Reset
+   RegVal = XFsbl_In32(GPIO_DATA_1) ;
+-  temp = ((RegVal) & (GPIO_MIO30_MASK))>>4;
+-  if (temp!=0x1) {
+-    xil_printf("USB is hold into reset. (GPIO_DATA_1, Val:%x)\r\n", RegVal);
+-  }
+-  temp = ((RegVal) & (GPIO_MIO31_MASK))>>5;
+-  if (temp!=0x1) {
+-    xil_printf("PCIe is hold into reset. (GPIO_DATA_1, Val:%x)\r\n", RegVal);
++  if (!(RegVal & (GPIO_MIO34_MASK))) {
++    xil_printf("USB0 is held in reset. (GPIO_DATA_1, Val:%x)\r\n", RegVal);
++  }
++
++  if (!(RegVal & (GPIO_MIO35_MASK))) {
++    xil_printf("USB1 is held in reset. (GPIO_DATA_1, Val:%x)\r\n", RegVal);
+   }
+   //check serdes(gtr)
+ #if defined(SERDES_PLL_REF_SEL0_PLLREFSEL0_DEFVAL)
+@@ -387,14 +362,6 @@
+     }
+   #endif
+   
+-  // change I2C switch to get access to EEPROM 
+-  xil_printf("Configure Carrier I2C Switch 0x73 for EEPROM access\r\n");
+-  Status = iic_write8(0x73, 0x00,  0x20);    // Configure I2C Switch
+-  if (Status != XFSBL_SUCCESS) {
+-     xil_printf("Error: Configure Carrier I2C Switch 0x73\r\n");
+-     goto END;
+-  }
+-  
+   xil_printf("\r\n--------------------------------------------------------------------------------\r\n");
+ 
+   END:
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h
+--- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-22 12:36:18.043028338 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-22 12:37:00.007403649 +0200
+@@ -31,6 +31,8 @@
+ #define USE_TE_PSU_FOR_SI_INIT //enable TE PSU to write SI on the correct place in the FSBL (Xilinx default PSU is deactivated)
+ 
+ 
++#define GPIO_MIO35_MASK	0x00000200U
++#define GPIO_MIO34_MASK	0x00000100U
+ #define GPIO_MIO31_MASK	0x00000020U
+ #define GPIO_MIO30_MASK	0x00000010U
+ #define ICM_CFG_VAL_PCIE	0X1U
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S
+--- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-22 12:36:18.043028338 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-22 12:37:00.007403649 +0200
+@@ -60,6 +60,8 @@
+ /************************** Variable Definitions *****************************/
+ 
+ XFsbl_Exit:
++.endless:
++	b	.endless
+ 
+ #ifndef ARMA53_64
+ 	mov	 lr, r0	/* move the destination address into link register */
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c
+--- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-22 12:36:18.043028338 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-22 12:37:00.007403649 +0200
+@@ -556,6 +556,8 @@
+ {
+ 	u32 RegVal;
+ 
++	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++
+ 	/*
+ 	 * Write 1U to PMU GLOBAL general storage register 5 to indicate
+ 	 * PMU Firmware that FSBL completed execution
