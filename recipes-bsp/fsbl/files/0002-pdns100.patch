@@ -125,18 +125,6 @@ diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h ../git/lib/sw_
  #define GPIO_MIO31_MASK	0x00000020U
  #define GPIO_MIO30_MASK	0x00000010U
  #define ICM_CFG_VAL_PCIE	0X1U
-diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S
---- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-23 09:47:44.290548569 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-23 09:48:34.967002101 +0200
-@@ -60,6 +60,8 @@
- /************************** Variable Definitions *****************************/
- 
- XFsbl_Exit:
-+.endless:
-+	b	.endless
- 
- #ifndef ARMA53_64
- 	mov	 lr, r0	/* move the destination address into link register */
 diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c
 --- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-23 09:47:44.290548569 +0200
 +++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-23 09:48:34.967002101 +0200
