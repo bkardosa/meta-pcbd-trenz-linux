@@ -1,20 +1,6 @@
-diff -Naurw ./lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h ../git/lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h
---- ./lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h	2021-07-22 12:36:18.039028303 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/misc/zcu102/a53/xparameters.h	2021-07-22 12:39:50.156924603 +0200
-@@ -29,8 +29,8 @@
- /* Number of Fabric Resets */
- #define XPAR_NUM_FABRIC_RESETS 1
- 
--#define STDIN_BASEADDRESS 0xFF000000
--#define STDOUT_BASEADDRESS 0xFF000000
-+#define STDIN_BASEADDRESS 0xFF010000
-+#define STDOUT_BASEADDRESS 0xFF010000
- 
- /******************************************************************/
- 
 diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c
---- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-22 12:36:18.043028338 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-22 12:37:00.007403649 +0200
+--- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-23 09:47:44.286548533 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c	2021-07-23 09:48:34.967002101 +0200
 @@ -143,30 +143,18 @@
    xil_printf("TE0803 TE_XFsbl_HookPsuInit_Custom\r\n"); 
    /* Add the code here */
@@ -128,8 +114,8 @@ diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.c ../git/lib/sw_
  
    END:
 diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h
---- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-22 12:36:18.043028338 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-22 12:37:00.007403649 +0200
+--- ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-23 09:47:44.286548533 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h	2021-07-23 09:48:34.967002101 +0200
 @@ -31,6 +31,8 @@
  #define USE_TE_PSU_FOR_SI_INIT //enable TE PSU to write SI on the correct place in the FSBL (Xilinx default PSU is deactivated)
  
@@ -140,8 +126,8 @@ diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/te_xfsbl_hooks_te0803.h ../git/lib/sw_
  #define GPIO_MIO30_MASK	0x00000010U
  #define ICM_CFG_VAL_PCIE	0X1U
 diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S
---- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-22 12:36:18.043028338 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-22 12:37:00.007403649 +0200
+--- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-23 09:47:44.290548569 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S	2021-07-23 09:48:34.967002101 +0200
 @@ -60,6 +60,8 @@
  /************************** Variable Definitions *****************************/
  
@@ -152,8 +138,8 @@ diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_exit.S ../git/lib/sw_apps/zynqmp
  #ifndef ARMA53_64
  	mov	 lr, r0	/* move the destination address into link register */
 diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c
---- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-22 12:36:18.043028338 +0200
-+++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-22 12:37:00.007403649 +0200
+--- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-23 09:47:44.290548569 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c	2021-07-23 09:48:34.967002101 +0200
 @@ -556,6 +556,8 @@
  {
  	u32 RegVal;
@@ -163,3 +149,101 @@ diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_handoff.c ../git/lib/sw_apps/zyn
  	/*
  	 * Write 1U to PMU GLOBAL general storage register 5 to indicate
  	 * PMU Firmware that FSBL completed execution
+diff -Naurw ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_main.c ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_main.c
+--- ./lib/sw_apps/zynqmp_fsbl/src/xfsbl_main.c	2021-07-23 09:47:44.290548569 +0200
++++ ../git/lib/sw_apps/zynqmp_fsbl/src/xfsbl_main.c	2021-07-23 09:48:54.811179706 +0200
+@@ -130,6 +130,8 @@
+ 			}break;
+ 
+ 		case XFSBL_STAGE2:
++		  	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++			usleep( 5000 );
+ 			{
+ 				/* Reading Timer value for Performance measurement.*/
+ #ifdef XFSBL_PERF
+@@ -148,7 +150,11 @@
+ 				 *  partition header
+ 				 */
+ 
++
+ 				FsblStatus = XFsbl_BootDeviceInitAndValidate(&FsblInstance);
++				xil_printf( "**** %s %i   Status: %i\r\n", __func__, __LINE__, FsblStatus );
++				usleep( 5000 );
++
+ 				if ( (XFSBL_SUCCESS != FsblStatus) &&
+ 						(XFSBL_STATUS_JTAG != FsblStatus) )
+ 				{
+@@ -195,6 +201,8 @@
+ 			} break;
+ 
+ 		case XFSBL_STAGE3:
++		  	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++			usleep( 5000 );
+ 			{
+ 
+ 				XFsbl_Printf(DEBUG_INFO,
+@@ -209,6 +217,9 @@
+ 				 */
+ 				FsblStatus = XFsbl_PartitionLoad(&FsblInstance,
+ 								  PartitionNum);
++				xil_printf( "**** %s %i   Status: %i\r\n", __func__, __LINE__, FsblStatus );
++				usleep( 5000 );
++
+ 				if (XFSBL_SUCCESS != FsblStatus)
+ 				{
+ 					/**
+@@ -229,6 +240,8 @@
+ 					 */
+ 
+ 					FsblStatus = XFsbl_CheckEarlyHandoff(&FsblInstance, PartitionNum);
++					xil_printf( "**** %s %i   Status: %i\r\n", __func__, __LINE__, FsblStatus );
++					usleep( 5000 );
+ 
+ 					if (PartitionNum <
+ 						(FsblInstance.ImageHeader.ImageHeaderTable.NoOfPartitions-1U))
+@@ -263,6 +276,8 @@
+ 			} break;
+ 
+ 		case XFSBL_STAGE4:
++		  	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++			usleep( 5000 );
+ 			{
+ 
+ 				XFsbl_Printf(DEBUG_INFO,
+@@ -304,6 +319,8 @@
+ 			} break;
+ 
+ 		case XFSBL_STAGE_ERR:
++		  	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++			usleep( 5000 );
+ 			{
+ 				XFsbl_Printf(DEBUG_INFO,
+ 						"================= In Stage Err ============ \n\r");
+@@ -317,6 +334,8 @@
+ 
+ 		case XFSBL_STAGE_DEFAULT:
+ 		default:
++		  	xil_printf( "**** %s %i\r\n", __func__, __LINE__ );
++			usleep( 5000 );
+ 			{
+ 				/**
+ 				 * we should never be here
+diff -Naurw ./XilinxProcessorIPLib/drivers/sdps/src/xsdps_card.c ../git/XilinxProcessorIPLib/drivers/sdps/src/xsdps_card.c
+--- ./XilinxProcessorIPLib/drivers/sdps/src/xsdps_card.c	2021-07-23 09:47:43.350540157 +0200
++++ ../git/XilinxProcessorIPLib/drivers/sdps/src/xsdps_card.c	2021-07-23 09:48:34.967002101 +0200
+@@ -134,6 +134,7 @@
+ {
+ 	s32 Status;
+ 
++#if 0
+ 	if ((InstancePtr->HC_Version == XSDPS_HC_SPEC_V3) &&
+ 			((InstancePtr->Host_Caps & XSDPS_CAPS_SLOT_TYPE_MASK)
+ 			== XSDPS_CAPS_EMB_SLOT)) {
+@@ -141,6 +142,7 @@
+ 		Status = XST_SUCCESS;
+ 		goto RETURN_PATH;
+ 	}
++#endif
+ 
+ 	/* 74 CLK delay after card is powered up, before the first command. */
+ 	usleep(XSDPS_INIT_DELAY);
