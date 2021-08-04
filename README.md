@@ -58,6 +58,10 @@ Creating petalinux-image-minimal SD-card image:
 ```
 $ petalinux-package --wic --bootfiles "BOOT.BIN Image boot.scr"
 ```
+SD-card image will be written to images/linux/petalinux-sdimage.wic
+
+This image will contain all the Linux kernel modules.
+
 <br/>
 
 Testing USB gadget
