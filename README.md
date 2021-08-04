@@ -43,13 +43,28 @@ Among others the following 3 boot files will be generated:
 - images/linux/boot.scr
 <br/>
 
-Creating the final SD-card image:
+Creating the final SD-card image with Debian:
 - download debian image from the same [Trenz download site](https://shop.trenz-electronic.de/Download/?path=Trenz_Electronic/Modules_and_Module_Carriers/5.2x7.6/TE0803/Reference_Design/2019.2/SK_DEMO1)
 - write it to an SD-card and mount it
 - erase all files on the boot partition (240MiB vfat partition)
 - copy the 3 boot files from images/linux to the boot partition
+- edit /etc/fstab on the root partition and change 'mmcblk1' to 'mmcblk0'
+
+Note that the Debian image doesn't contain Linux kernel modules, those need to be deployed manually.
+
 <br/>
 
-Done!
+Creating petalinux-image-minimal SD-card image:
+```
+$ petalinux-package --wic --bootfiles "BOOT.BIN Image boot.scr"
+```
 <br/>
 
+Testing USB gadget
+
+Boot up Linux, login with 'root'/'root' and execute the following:
+```
+# dd if=/dev/zero bs=1M count=128 of=tmp_file
+# modprobe g_mass_storage file=$(pwd)/tmp_file
+```
+<br/>

@@ -39,7 +39,15 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
     snps,dis_u3_susphy_quirk;
     snps,dis_u2_susphy_quirk;
     phy-names = "usb2-phy","usb3-phy";
-    phys = <&lane1 4 0 2 100000000>;
+    phys = <&lane2 4 0 2 100000000>;
+    maximum-speed = "super-speed";
+};
+
+&dwc3_1 {
+    status = "okay";
+    dr_mode = "peripheral";
+    phy-names = "usb2-phy","usb3-phy";
+    phys = <&lane3 4 1 2 100000000>;
     maximum-speed = "super-speed";
 };
 
