@@ -53,7 +53,7 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
 
 /* ETH PHY */
 
-&gem3 {
+&gem1 {
 	phy-handle = <&phy0>;
 	phy0: phy0@1 {
 		device_type = "ethernet-phy";
@@ -85,4 +85,38 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
     };
 };
 
+
+
+&i2c1 {
+    switch0: switch@5f {
+    	 #address-cells = <1>;
+         #size-cells = <0>;
+         compatible = "microchip,ksz9897";
+         reg = <0x5f>;
+
+         status = "okay";
+
+         ports {
+             #address-cells = <1>;
+             #size-cells = <0>;
+             port@0 {
+                 reg = <0>;
+                 label = "lan1";
+             };
+             port@1 {
+                 reg = <1>;
+                 label = "lan2";
+             };
+             port2switch: port@2 {
+                 reg = <2>;
+                 label = "cpu";
+                 ethernet = <&gem1>;
+                 fixed-link {
+                     speed = <1000>;
+                     full-duplex;
+                 };
+             };
+         };
+    };
+};
 
