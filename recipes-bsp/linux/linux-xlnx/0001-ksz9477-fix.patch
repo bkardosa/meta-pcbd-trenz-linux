@@ -1,0 +1,117 @@
+From d34437e0446172459f47b4ca0293908023a54930 Mon Sep 17 00:00:00 2001
+From: bkardos <botond.kardos@pcbdesign.hu>
+Date: Tue, 31 Aug 2021 10:01:27 +0200
+Subject: [PATCH] ksz9477.ko now reads "phy-mode" and "speed" from devicetree
+
+---
+ drivers/net/dsa/microchip/ksz9477.c | 55 ++++++++++++++++++++++++-----
+ 1 file changed, 47 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index 50ffc63d6231..1f275648301a 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -13,6 +13,7 @@
+ #include <linux/if_bridge.h>
+ #include <net/dsa.h>
+ #include <net/switchdev.h>
++#include <linux/of_net.h>
+ 
+ #include "ksz9477_reg.h"
+ #include "ksz_common.h"
+@@ -1117,11 +1118,11 @@ static phy_interface_t ksz9477_get_interface(struct ksz_device *dev, int port)
+ 		break;
+ 	default:
+ 		interface = PHY_INTERFACE_MODE_RGMII;
+-		if (data8 & PORT_RGMII_ID_EG_ENABLE)
++		if (data8 & PORT_RGMII_ID_IG_ENABLE)
+ 			interface = PHY_INTERFACE_MODE_RGMII_TXID;
+-		if (data8 & PORT_RGMII_ID_IG_ENABLE) {
++		if (data8 & PORT_RGMII_ID_EG_ENABLE) {
+ 			interface = PHY_INTERFACE_MODE_RGMII_RXID;
+-			if (data8 & PORT_RGMII_ID_EG_ENABLE)
++			if (data8 & PORT_RGMII_ID_IG_ENABLE)
+ 				interface = PHY_INTERFACE_MODE_RGMII_ID;
+ 		}
+ 		break;
+@@ -1256,11 +1257,24 @@ static void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
+ 			data8 &= ~PORT_RGMII_ID_EG_ENABLE;
+ 			if (dev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
+ 			    dev->interface == PHY_INTERFACE_MODE_RGMII_RXID)
+-				data8 |= PORT_RGMII_ID_IG_ENABLE;
++				data8 |= PORT_RGMII_ID_EG_ENABLE;
+ 			if (dev->interface == PHY_INTERFACE_MODE_RGMII_ID ||
+ 			    dev->interface == PHY_INTERFACE_MODE_RGMII_TXID)
+-				data8 |= PORT_RGMII_ID_EG_ENABLE;
+-			p->phydev.speed = SPEED_1000;
++				data8 |= PORT_RGMII_ID_IG_ENABLE;
++			if(!p->phydev.speed)
++				p->phydev.speed = SPEED_1000;
++			if (p->phydev.speed < 1000 ) {
++				/* REG_PORT_XMII_CTRL_0 needs also be set when speed is not gbit */
++				u8 tmp;
++
++				ksz9477_set_gbit(dev, false, &data8);
++				ksz_read8(dev, REG_PORT_XMII_CTRL_0, &tmp);
++				if (p->phydev.speed == 100 )
++					tmp |= PORT_MII_100MBIT;
++				else
++					tmp &= ~PORT_MII_100MBIT;
++				ksz_pwrite8(dev, port, REG_PORT_XMII_CTRL_0, tmp);
++			}
+ 			break;
+ 		}
+ 		ksz_pwrite8(dev, port, REG_PORT_XMII_CTRL_1, data8);
+@@ -1291,7 +1305,11 @@ static void ksz9477_config_cpu_port(struct dsa_switch *ds)
+ {
+ 	struct ksz_device *dev = ds->priv;
+ 	struct ksz_port *p;
+-	int i;
++	const struct dsa_port *dp;
++	u32 speed;
++	int i, ret;
++	const char *phy_mode;
++	struct device_node *child;
+ 
+ 	ds->num_ports = dev->port_cnt;
+ 
+@@ -1300,14 +1318,35 @@ static void ksz9477_config_cpu_port(struct dsa_switch *ds)
+ 			phy_interface_t interface;
+ 
+ 			dev->cpu_port = i;
++			p = &dev->ports[i];
+ 			dev->host_mask = (1 << dev->cpu_port);
+ 			dev->port_mask |= dev->host_mask;
+ 
++			interface = PHY_INTERFACE_MODE_NA;
++			dp = dsa_to_port(ds, i);
++			if ((dp != NULL) && (dp->dn != NULL)) {
++				/* read "phy-mode" first */
++			  	ret = of_get_phy_mode(dp->dn);
++				if (ret > 0)
++					interface = ret;
++
++				/* search for "speed" value in child nodes */
++				for_each_child_of_node(dp->dn, child) {
++					ret = of_property_read_u32(child, "speed", &speed );
++					if (!ret && ((speed == 10) || (speed == 100) || (speed==1000))) {
++						p->phydev.speed = speed;
++						break;
++					}
++				}
++			}
++
+ 			/* Read from XMII register to determine host port
+ 			 * interface.  If set specifically in device tree
+ 			 * note the difference to help debugging.
+ 			 */
+-			interface = ksz9477_get_interface(dev, i);
++			if (interface == PHY_INTERFACE_MODE_NA)
++				interface = ksz9477_get_interface(dev, i);
++
+ 			if (!dev->interface)
+ 				dev->interface = interface;
+ 			if (interface && interface != dev->interface)
+-- 
+2.20.1
+

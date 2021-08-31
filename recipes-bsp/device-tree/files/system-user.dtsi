@@ -1,4 +1,5 @@
 /include/ "system-conf.dtsi"
+#include <dt-bindings/gpio/gpio.h>
 
 / {
     aliases {
@@ -22,9 +23,8 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
 /* SD */
 
 &sdhci0 {
-	disable-wp;
-	no-1-8-v;
-
+    disable-wp;
+    no-1-8-v;
 };
 
 
@@ -54,11 +54,11 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
 /* ETH PHY */
 
 &gem1 {
-	phy-handle = <&phy0>;
-	phy0: phy0@1 {
-		device_type = "ethernet-phy";
-		reg = <1>;
-	};
+    phy-mode = "rgmii-id";
+    fixed-link {
+        speed = <1000>;
+        full-duplex;
+    };
 };
 
 /* QSPI */
@@ -89,11 +89,11 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
 
 &i2c1 {
     switch0: switch@5f {
-    	 #address-cells = <1>;
+         #address-cells = <1>;
          #size-cells = <0>;
          compatible = "microchip,ksz9897";
          reg = <0x5f>;
-
+         reset-gpios = <&gpio 50 GPIO_ACTIVE_LOW>;
          status = "okay";
 
          ports {
@@ -107,10 +107,11 @@ serdes: // PHY TYP see: dt-bindings/phy/phy.h
                  reg = <1>;
                  label = "lan2";
              };
-             port2switch: port@2 {
+             port@2 {
                  reg = <2>;
                  label = "cpu";
                  ethernet = <&gem1>;
+                 phy-mode = "rgmii-id";
                  fixed-link {
                      speed = <1000>;
                      full-duplex;
