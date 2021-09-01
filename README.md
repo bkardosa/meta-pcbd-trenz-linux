@@ -24,7 +24,7 @@ $ petalinux-create -t project --template zynqMP --name my-trenz-linux
 $ cd my-trenz-linux/
 $ cp <PATH_TO_XSA> .
 $ cd project-spec/
-$ git clone https://redmine.pcbdesign.hu/git/sw241
+$ git clone https://redmine.pcbdesign.hu/git/sw241 meta-pcbd-trenz-linux
 $ cd ../
 $ petalinux-config --get-hw-description
 ```
