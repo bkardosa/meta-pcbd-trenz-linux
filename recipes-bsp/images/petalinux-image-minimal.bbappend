@@ -3,6 +3,9 @@ IMAGE_INSTALL_append = " \
                        libgpiod \
                        ethtool \
                        tcpdump \
-                       iperf3\
+                       iperf3 \
+                       iw \
+                       wpa-supplicant \
+                       pcbd-root-files \
                        "
 
