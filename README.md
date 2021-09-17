@@ -35,7 +35,7 @@ ${proot}/project-spec/meta-pcbd-trenz-linux
 Exit petalinux-config, save the modified configuration and build the required files by
 ```
 $ petalinux-build
-$ petalinux-package --boot --format BIN --fsbl images/linux/zynqmp_fsbl.elf --u-boot --force
+$ petalinux-package --boot --format BIN --fsbl images/linux/zynqmp_fsbl.elf --fpga images/linux/system.bit --u-boot --force
 ```
 Among others the following 3 boot files will be generated:
 - images/linux/BOOT.BIN
