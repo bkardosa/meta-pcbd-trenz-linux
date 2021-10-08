@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2019.2.1 (64-bit)
+# SW Build 2729669 on Thu Dec  5 04:48:12 MST 2019
+# IP Build 2729494 on Thu Dec  5 07:38:25 MST 2019
+# Start of session at: Fri Oct  8 13:36:28 2021
+# Process ID: 249653
+# Current directory: /home/bopcb/work/vivado/pcb361_dp2/pcb361_dp2.runs/zusys_inv_0_0_synth_1
+# Command line: vivado -log zusys_inv_0_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source zusys_inv_0_0.tcl
+# Log file: /home/bopcb/work/vivado/pcb361_dp2/pcb361_dp2.runs/zusys_inv_0_0_synth_1/zusys_inv_0_0.vds
+# Journal file: /home/bopcb/work/vivado/pcb361_dp2/pcb361_dp2.runs/zusys_inv_0_0_synth_1/vivado.jou
+#-----------------------------------------------------------
+source zusys_inv_0_0.tcl -notrace

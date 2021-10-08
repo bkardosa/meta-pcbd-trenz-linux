@@ -1,0 +1,8 @@
+set_property PACKAGE_PIN C7 [get_ports dp_aux_data_out_0]
+set_property IOSTANDARD LVCMOS18 [get_ports dp_aux_data_out_0]
+set_property PACKAGE_PIN E7 [get_ports dp_aux_data_in_0]
+set_property IOSTANDARD LVCMOS18 [get_ports dp_aux_data_in_0]
+set_property PACKAGE_PIN D2 [get_ports {dp_aux_data_oe[0]}]
+set_property IOSTANDARD LVCMOS18 [get_ports {dp_aux_data_oe[0]}]
+set_property PACKAGE_PIN G4 [get_ports dp_hot_plug_detect_0]
+set_property IOSTANDARD LVCMOS18 [get_ports dp_hot_plug_detect_0]

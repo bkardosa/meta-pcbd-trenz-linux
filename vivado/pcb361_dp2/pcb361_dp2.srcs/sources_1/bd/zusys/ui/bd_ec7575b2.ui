@@ -1,0 +1,24 @@
+{
+   "ActiveEmotionalView":"Default View",
+   "Default View_ScaleFactor":"1.0",
+   "Default View_TopLeft":"-234,-124",
+   "ExpandedHierarchyInLayout":"",
+   "guistr":"# # String gsaved with Nlview 7.0.21  2019-05-29 bk=1.5064 VDI=41 GEI=36 GUI=JA:9.0 TLS
+#  -string -flagsOSRD
+preplace port dp_aux_data_in_0 -pg 1 -lvl 0 -x -20 -y 240 -defaultsOSRD
+preplace port dp_aux_data_out_0 -pg 1 -lvl 2 -x 680 -y 40 -defaultsOSRD
+preplace port dp_hot_plug_detect_0 -pg 1 -lvl 0 -x -20 -y 260 -defaultsOSRD
+preplace portBus dp_aux_data_oe -pg 1 -lvl 2 -x 680 -y 20 -defaultsOSRD
+preplace inst inv_0 -pg 1 -lvl 1 -x 330 -y 20 -defaultsOSRD
+preplace inst zynq_ultra_ps_e_0 -pg 1 -lvl 1 -x 330 -y 240 -defaultsOSRD
+preplace netloc dp_aux_data_in_0_1 1 0 1 N 240
+preplace netloc dp_hot_plug_detect_0_1 1 0 1 N 260
+preplace netloc inv_0_Res 1 1 1 N 20
+preplace netloc zynq_ultra_ps_e_0_dp_aux_data_oe_n 1 0 2 0 80 650
+preplace netloc zynq_ultra_ps_e_0_dp_aux_data_out 1 1 1 660 40n
+preplace netloc zynq_ultra_ps_e_0_pl_clk1 1 0 2 0 130 640
+levelinfo -pg 1 -20 330 680
+pagesize -pg 1 -db -bbox -sgen -230 -40 880 350
+"
+}
+0
