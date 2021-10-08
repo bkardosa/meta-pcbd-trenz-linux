@@ -30,7 +30,7 @@ $ petalinux-config --get-hw-description
 ```
 In petalinux-config chose "Yocto setting" --> "User Layers" --> "user layer 0" and enter:
 ```
-${proot}/project-spec/meta-pcbd-trenz-linux
+${proot}/project-spec/meta-pcbd-trenz-linux/meta
 ```
 Exit petalinux-config, save the modified configuration and build the required files by
 ```
